@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chord Helper</title>
+	<style>
+		* {
+			font-size: 40px;
+			font-family: sans-serif;
+		}
+		div {
+			padding: 3px;
+		}
+		.hidden {
+			display: none;
+		}
+		span {
+			padding: 8px;
+			cursor: default;
+		}
+		span:hover {
+			background-color: #dfe;
+		}
+		.barline {
+			background-color: #eef5ff;
+			position: relative;
+			border-left: 3px solid #113188;
+		}
+		.repeater {
+			background-color: #eef5ff;
+		}
+		.repeater:before {
+			color: #113188;
+			content: ":";
+			font-weight: bold;
+		}
+		.chord_line_item {
+			color: #888;
+			font-size: 50px;
+			font-weight: bold;
+			padding-top: 15px;
+		}
+		.chord {
+			color: #113188;
+		}
+		.beat_word {
+			background-color: #eef5ff;
+			font-weight: bold;
+			position: relative;
+			border-bottom: 2px solid #113188;
+		}
+		.beat_word::before {
+			content: "(";
+			color: #7799BB;
+			position: absolute;
+			left: -5px;
+			bottom: 8px;
+		}
+		.beat_word::after {
+			content: ")";
+			color: #7799BB;
+			position: absolute;
+			right: -5px;
+			bottom: 8px;
+		}
+	</style>
+</head>
+<body>
+
+
+	<!-- Button to save HTML source code -->
+	<button onclick="saveHTML()">Save HTML</button>
+  <!-- Button to save HTML source code -->
+  <button onclick="saveModifiedHTML()">Save plain text</button>
+
+	<div class="hidden">
+G/F                        Cm Bm         D7     
+G                                  D
+I saw the colors of the rainbow
+              C/E                        G
+Up there against the distance sunglow
+        Em       Bm   Em C            G
+The air was soft and blue birds could hide
+            E7   A7           D
+I wished that time was on my side
+    G                            D
+So I could ride that pretty rainbow
+     C/E Em                  G
+And fly across the western sky
+         Em7       Bm        C            G
+So come with me and you'll see my friend
+           E7  Am   D Cm G
+The colors of the rainbow's end
+      Cmaj7       Bm      Am7       G
+I always remember of how we used to meet
+              E7         Am
+I heard sweet songs up above
+     B7     Em          D             G
+The meadow was so green when I sat down to dream
+             E Am     G      D   Am7   D7
+That was the time when I found love
+     G                            D
+I saw the colors of the rainbow
+       C                          G
+Up there against the distance sunglow
+     Em       Bm        C            G
+One summer's days that rainbow came
+        E7/Ab Am   D    G
+To chase away the morning rain
+                                        D                                       D     G
+*I always remember of how we used to meet*
+          E7         Am                         D         D              
+*I heard sweet songs up above*
+  G                                  D
+I saw the colors of the rainbow
+     C                           G
+Up there against the distance sunglow
+                  Bm          C             G
+One summer's day that rainbow came
+         E7  Am   D7  G
+To chase away the morning rain
+
+
+               C G/F    Cm G   Bm     F
+*I sat down to dream*
+Gmaj7         C      G     Cm7   G
+*And that was the time when I found love*
+	</div>
+
+
+
+	<script>
+	
+		function hasChordChars(str) {
+			const chordChars = /[A-Ga-jmMdiugb#0-9 ]/g;
+			const match = str.match(chordChars);
+			const chordCharCount = match ? match.length : 0;
+			const percentValidChars = chordCharCount / str.length;
+			return percentValidChars > 0.9;
+		}
+	
+		const textContent = document.getElementsByTagName('div')[0].innerHTML;
+
+		const lines = textContent.split('\n');
+		const div_object = document.createElement('div');
+		
+		for (let i = 0; i < lines.length; i++) {
+			const paragraph = document.createElement('div');
+			const line = lines[i];
+			isChordLine = hasChordChars(line);
+			
+			if (isChordLine) {
+				paragraph.classList.add('chord_line_item');
+			}
+
+			const words = line.split(/([a-zA-Z]+\s+)?([\u4e00-\u9fa5])/g);
+
+			for (let j = 0; j < words.length; j++) {
+				const word = words[j];
+				
+				if (!word) {
+					continue;
+				}
+
+				ch = word.split(' ');
+				
+				for (let k = 0; k < ch.length; k++) {
+
+					const span = document.createElement('span');
+					span.innerText = ch[k];
+					
+					if (isChordLine) {
+						if (ch[k].length === 0){
+							span.innerHTML = '';
+							span.addEventListener('click', function() {
+							if (span.classList.contains('barline')) {
+								span.classList.remove('barline');
+								span.classList.add('repeater');
+							} else if (span.classList.contains('repeater')) {
+								span.classList.remove('repeater');
+							} else {
+								span.classList.add('barline');
+							}
+							});
+						} else {
+							span.innerText = ch[k];
+							span.addEventListener('click', function() {
+								if (span.classList.contains('chord')) {
+									span.classList.remove('chord');
+								} else {
+									span.classList.add('chord');
+								}
+							});
+						}
+					} else {
+						span.innerText = ch[k];
+						span.addEventListener('click', function() {
+							if (span.classList.contains('beat_word')) {
+								span.classList.remove('beat_word');
+							} else {
+								span.classList.add('beat_word');
+							}
+						});
+					}
+					
+					paragraph.appendChild(span);
+				}
+			}
+			div_object.appendChild(paragraph);
+		}
+
+		document.body.appendChild(div_object);
+		
+		
+		function saveHTML() {
+			// Clone the document and remove the hidden elements
+			var clonedDocument = document.cloneNode(true);
+			var hiddenElements = clonedDocument.getElementsByClassName("hidden");
+			for (var i = 0; i < hiddenElements.length; i++) {
+				hiddenElements[i].parentNode.removeChild(hiddenElements[i]);
+			}
+
+			var htmlContent = clonedDocument.documentElement.outerHTML; // Get the HTML source code
+
+			var fileBlob = new Blob([htmlContent], { type: 'text/html' }); // Create a Blob from the HTML content
+			var fileUrl = URL.createObjectURL(fileBlob); // Create a URL for the Blob
+
+			var a = document.createElement('a'); // Create a link element
+			a.href = fileUrl; // Set the URL as the link's href
+			a.download = 'chord mark beat saves.html'; // Specify the filename for the downloaded file
+			a.click(); // Programmatically trigger the click event
+
+			URL.revokeObjectURL(fileUrl); // Clean up the URL object
+		}
+		
+		
+		function saveModifiedHTML() {
+			var clonedDocument = document.cloneNode(true);
+			
+			var divElements = clonedDocument.getElementsByTagName("div");
+			var htmlContent = '';
+
+			for (var i = 2; i < divElements.length; i++) {
+				
+				if (divElements[i].classList.contains("hidden")) {
+					continue; // Skip hidden elements
+				}
+			
+				if (i > 0) {
+				  htmlContent += "<BR>"; // Add a new line before each new div
+				}
+
+				var isChordLine = divElements[i].classList.contains("chord_line_item");
+
+				var spanElements = divElements[i].getElementsByTagName("span");
+				for (var j = 0; j < spanElements.length; j++) {
+					var span = spanElements[j];
+					var classNames = span.classList;
+					var text = span.textContent.trim();
+					
+					if (isChordLine && !classNames.contains("chord") ) {
+						text = '';
+					}
+
+					if (classNames.contains("barline")) {
+						text = "|" + text; // Add "|" before the text
+					} else if (classNames.contains("repeater")) {
+						text = ":" + text; // Add ":" before the text
+					} else if (classNames.contains("chord")) {
+						text = "<b>" + text + "</b>"; // Add "<b>" before the text, "</b>" after the text
+					} else if (classNames.contains("beat_word")) {
+						text = "(" + text + ")"; // Add "(" before the text, ")" after the text
+					}
+
+
+					htmlContent += text + "&nbsp;"; // Append the modified text
+				}
+			}
+			
+			
+			
+			var fileBlob = new Blob([htmlContent], { type: 'text/html' });
+			var fileUrl = URL.createObjectURL(fileBlob);
+
+			var a = document.createElement('a');
+			a.href = fileUrl;
+			a.download = 'chord mark beat plain text.html';
+			a.click();
+
+			URL.revokeObjectURL(fileUrl);
+		}
+		
+	</script>
+</body>
+</html>
